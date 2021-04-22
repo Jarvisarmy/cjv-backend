@@ -2,6 +2,7 @@ package com.example.fake_amazon_API.controllers;
 
 import com.example.fake_amazon_API.CustomizedResponse;
 import com.example.fake_amazon_API.models.UserModel;
+import com.example.fake_amazon_API.models.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
-@CrossOrigin(origins="*")
+@CrossOrigin(origins="*",allowedHeaders="*")
 @RestController
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping(value="/auth",consumes={
             MediaType.APPLICATION_JSON_VALUE
@@ -29,8 +32,9 @@ public class AuthController {
         try {
             Authentication request = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             Authentication token = authenticationManager.authenticate(request);
-            var response = new CustomizedResponse("You login in successfully", null);
-            return new ResponseEntity(token, HttpStatus.OK);
+            UserModel foundUser = userRepository.findByUsername(user.getUsername());
+            var response = new CustomizedResponse("You login in successfully", Collections.singletonList(foundUser));
+            return new ResponseEntity(response, HttpStatus.OK);
         } catch(BadCredentialsException ex){
             var response = new CustomizedResponse("Your username and/or password were entered incorrectly", null);
             return new ResponseEntity(response, HttpStatus.UNAUTHORIZED);

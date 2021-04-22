@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-@CrossOrigin(origins="*")
+@CrossOrigin(origins="*",allowedHeaders="*")
 @RestController
 public class ProductController {
     @Autowired
